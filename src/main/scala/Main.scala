@@ -9,6 +9,7 @@ object Main extends App {
   var sWorkingDir="D:\\AD\\app\\"
 
   /* parse impressions.json data and return them as list of Impression object*/
+  /* Duplicate ID with different appID and CountryCode can impact result when ID is not null so app will be retun error */
   var pImpressions=new JsonParser[Impression](sWorkingDir+"impressions.json");
   var lImpressions=pImpressions.Parse();
 

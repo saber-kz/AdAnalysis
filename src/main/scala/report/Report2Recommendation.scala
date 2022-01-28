@@ -57,6 +57,10 @@ def Execute(): List[Map[String,Any]] = {
   dfImpressions.cache()
   dfImpressions.createOrReplaceTempView("Impressions")
 
+  /*Duplicate ID with different appID and CountryCode can impact result */
+  if(spark.sql("SELECT ID,COUNT(1) CN FROM (SELECT DISTINCT ID,country_code,app_id FROM Impressions  where ID IS NOT NULL) GROUP BY ID HAVING COUNT(1)>1").count()>0)
+    {Log.Print("ERROR",s"Duplicate ID with different appID and CountryCode")
+      throw new Exception("Duplicate ID with different appID and CountryCode");}
 
   val dfResult=spark.sql(
     """SELECT *  FROM (
@@ -91,9 +95,11 @@ def Execute(): List[Map[String,Any]] = {
   GROUP BY app_id,country_code
   order by 3 DESC""").show(1000)
 */
-  //  spark.sql("SELECT * FROM (SELECT * FROM Impressions where app_id=28 and  country_code is  null) A LEFT JOIN Clicks B ON A.id=B.impression_id").show(1000,false)
+  //spark.sql("SELECT * FROM (SELECT * FROM Impressions where app_id=28 and  country_code is  null) A LEFT JOIN Clicks B ON A.id=B.impression_id").show(1000,false)
   //spark.sql("SELECT * FROM Clicks  WHERE impression_id IN (SELECT DISTINCT ID FROM Impressions where app_id=28 and  country_code is  null)").show(1000,false)
   //spark.sql("SELECT app_id,country_code,count(DISTINCT ID),COUNT(1) FROM Impressions  GROUP BY app_id,country_code").show(1000,false)
+  //spark.sql("SELECT ID,COUNT(1) CN FROM (SELECT DISTINCT ID,country_code,app_id FROM Impressions where ID IS NOT NULL) GROUP BY ID HAVING COUNT(1)>1").show(1000,false)
+  //spark.sql("SELECT country_code,app_id,count(distinct advertiser_id),count(1) FROM Impressions GROUP by country_code,app_id").show(1000,false)
   spark.close();
   return dResult;
 }

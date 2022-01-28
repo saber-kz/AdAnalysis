@@ -62,9 +62,11 @@ class Report1Summery(var impressions:ListBuffer[Impression],var clicks:ListBuffe
         var revenue:Double=0;
         var check=0;
 
+        /*Duplicate ID with different appID and CountryCode can impact result */
         im._2.foreach(iml=>{
           if(check==1 && id!=null &&(appID!=iml.tfAppID || id!=iml.tfID))
-          {throw new Exception("Duplicate ID with diffrent appID and CountryCode");}
+          {Log.Print("ERROR",s"Duplicate ID with different appID and CountryCode");
+            throw new Exception("Duplicate ID with different appID and CountryCode");}
           appID=iml.tfAppID;
           countryCode=iml.tfCountryCode;
           id=iml.tfID;
